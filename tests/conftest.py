@@ -38,6 +38,7 @@ def as_resident(source: Path, target: Path) -> Path:
 
 def make_vault(root: Path, examples_dir: Path, *, resident: bool = False) -> Path:
     """A scratch vault holding both hub examples and the author's note."""
+    root.mkdir(parents=True, exist_ok=True)
     (root / ".cofrealma").write_text("", encoding="utf-8")
     pairs = {
         "pellam-quist.persona.yaml": root / "personas/pellam/definition.persona.yaml",
