@@ -15,7 +15,7 @@ It is a generic library, not a museum component, so its name carries no brand em
 | `miraveja-persona decide FINGERPRINT --as accepted\|not-an-issue --by NAME` | Record a team member's decision on an uncertain finding. |
 | `miraveja-persona pasts ROOT` | List every shared past in the vault. |
 | `miraveja-persona freeze PATH --tree ROOT` | Record a definition's birth in the vault's ledger. |
-| `miraveja-persona guard [PATH...]` | Block definitions, author's notes and vault markers in a public repository. Never prints their content. |
+| `miraveja-persona guard [PATH...]` | Block definitions, author's notes, vault markers and secret-shaped values in a public repository. Never prints what it blocks. A deliberate fake secret in a fixture is marked with `guard: fake-secret` on its line. |
 
 For the persona runtime:
 

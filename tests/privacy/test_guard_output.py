@@ -34,3 +34,16 @@ def test_output_is_file_line_and_reason_only(
     for line in lines:
         location, state, reason = line.split("  ", 2)
         assert state == "blocked" and ":" in location and reason
+
+
+def test_secret_values_are_never_printed(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    folder = tmp_path / "public"
+    folder.mkdir()
+    secret = "gh" + "p_" + "Z9y8X7w6V5u4T3s2R1q0P9o8"
+    (folder / "settings.toml").write_text(f'token = "{secret}"\n')
+    assert main(["guard", str(folder)]) == 1
+    captured = capsys.readouterr()
+    assert secret not in captured.out + captured.err
+    assert "secret-shaped value" in captured.out

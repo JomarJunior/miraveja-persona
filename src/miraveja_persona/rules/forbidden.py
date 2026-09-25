@@ -31,14 +31,20 @@ MODEL = [
     ),
     re.compile(r"(?i)\bmodel\s+(?:version|v?\d)"),
 ]
-SECRET = [
+# Token formats precise enough to scan any file with; the public-repository guard uses these.
+SECRET_TOKENS = [
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b|\bsk-[A-Za-z0-9]{20,}\b|\bAKIA[0-9A-Z]{16}\b"),
+    re.compile(r"\bxox[abp]-[A-Za-z0-9-]{10,}\b"),
+    re.compile(r"https?://[^\s/:@]+:[^\s/@]+@"),
+]
+# In a definition's prose, any key-value credential is also refused; too noisy for code.
+SECRET = [
+    *SECRET_TOKENS,
     re.compile(
         r"(?i)\b(?:api[_-]?key|secret[_-]?key|access[_-]?key|token|password|passwd"
         r"|client[_-]?secret)\s*[:=]\s*\S+"
     ),
-    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b|\bsk-[A-Za-z0-9]{20,}\b|\bAKIA[0-9A-Z]{16}\b"),
-    re.compile(r"https?://[^\s/:@]+:[^\s/@]+@"),
 ]
 
 

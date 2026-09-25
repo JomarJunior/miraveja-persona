@@ -122,3 +122,34 @@ def test_explicit_paths_are_scanned(tmp_path: Path, examples: Path) -> None:
 
 def test_missing_path_is_a_usage_error(tmp_path: Path) -> None:
     assert main(["guard", str(tmp_path / "nope")]) == 2
+
+
+# Secret-shaped values are assembled at runtime, so this test file never carries one.
+FAKE_TOKEN = "gh" + "p_" + "A1b2C3d4E5f6G7h8I9j0K1l2"
+FAKE_KEY_HEADER = "-----BEGIN " + "RSA PRIVATE KEY-----"
+FAKE_URL = "https://" + "user:hunter2" + "@example.org/repo"
+
+
+@pytest.mark.parametrize("secret", [FAKE_TOKEN, FAKE_KEY_HEADER, FAKE_URL])
+def test_secrets_are_blocked(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, secret: str) -> None:
+    """Constitution VIII: public repositories block secrets as well as definitions."""
+    root = repo(tmp_path)
+    (root / "config.py").write_text(f'VALUE = "{secret}"\n')
+    track(root, root / "config.py")
+    assert guard_in(root, monkeypatch) == 1
+
+
+def test_ordinary_code_passes(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = repo(tmp_path)
+    (root / "app.py").write_text("token: str = load_token()\npassword = ask()\n")
+    track(root, root / "app.py")
+    assert guard_in(root, monkeypatch) == 0
+
+
+def test_deliberate_fake_secret_can_be_marked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = repo(tmp_path)
+    (root / "fixture.yaml").write_text(f'key: "{FAKE_KEY_HEADER}"  # guard: fake-secret\n')
+    track(root, root / "fixture.yaml")
+    assert guard_in(root, monkeypatch) == 0

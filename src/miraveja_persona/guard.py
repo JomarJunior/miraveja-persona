@@ -1,7 +1,8 @@
 """The public-repository guard (R-9).
 
-Blocks any persona definition, author's note or vault marker not marked synthetic. It
-prints the file, the line and the reason, and never a word of the content it blocks.
+Blocks any persona definition, author's note or vault marker not marked synthetic, and any
+secret-shaped value (Constitution VIII). It prints the file, the line and the reason, and
+never a word of the content it blocks.
 """
 
 from __future__ import annotations
@@ -11,12 +12,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .check import Unreadable
+from .rules.forbidden import SECRET_TOKENS
 from .vault import MARKER
 from .yamlio import YamlProblem, parse_text
 
 SIGNATURES = ("miravejaPersona", "miravejaAuthorNote")
 NAMED = (".persona.yaml", ".note.yaml")
 LOOKAHEAD = 15
+# A line carrying this marker holds a deliberate fake secret, such as a test fixture.
+FAKE_SECRET_MARKER = "guard: fake-secret"
 
 
 @dataclass(frozen=True)
@@ -92,6 +96,17 @@ def _fragments(path: Path, text: str) -> list[Blocked]:
     return blocked
 
 
+def _secrets(path: Path, text: str) -> list[Blocked]:
+    """Constitution VIII. The value is never printed, only where it is."""
+    blocked = []
+    for i, line in enumerate(text.splitlines()):
+        if FAKE_SECRET_MARKER in line:
+            continue
+        if any(pattern.search(line) for pattern in SECRET_TOKENS):
+            blocked.append(Blocked(str(path), i + 1, "secret-shaped value"))
+    return blocked
+
+
 def check_file(path: Path) -> list[Blocked]:
     if path.name == MARKER:
         return [Blocked(str(path), 1, "vault marker")]
@@ -100,13 +115,14 @@ def check_file(path: Path) -> list[Blocked]:
         if path.name.endswith(NAMED):
             return [Blocked(str(path), 1, "unreadable persona file")]
         return []
+    secrets = _secrets(path, text)
     if path.suffix in (".yaml", ".yml"):
         verdict = _yaml_verdict(path, text)
         if verdict is None:
-            return []
+            return secrets
         if isinstance(verdict, Blocked):
-            return [verdict]
-    return _fragments(path, text)
+            return [verdict, *secrets]
+    return _fragments(path, text) + secrets
 
 
 def guard(paths: list[Path]) -> list[Blocked]:

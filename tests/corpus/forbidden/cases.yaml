@@ -23,7 +23,7 @@ cases:
     set: {/craft: "api_key = abcd1234efgh5678"}
     expect: [{rule: forbidden.secret, part: /craft}]
   - name: private-key
-    set: {/craft: "-----BEGIN RSA PRIVATE KEY----- MIIE"}
+    set: {/craft: "-----BEGIN RSA PRIVATE KEY----- MIIE"}  # guard: fake-secret
     expect: [{rule: forbidden.secret, part: /craft}]
   # Must pass.
   - name: steps-passes
