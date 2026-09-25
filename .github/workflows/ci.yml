@@ -7,7 +7,7 @@ on:
 env:
   # The hub commit whose spec 003 contracts this library is checked against (R-3).
   # Bump it deliberately when the hub's schemas or examples change.
-  HUB_COMMIT: ebade19ca779b8cbc0d8d794ce180368a2dd1ba7
+  HUB_COMMIT: 1185ac892fd9d46c2c09a63980e00519c522ddb8
 
 jobs:
   test:
