@@ -9,13 +9,15 @@ from __future__ import annotations
 import uuid
 from typing import Literal
 
+# Filled in at runtime, so this source file is never mistaken for a definition by the guard.
+SIGNATURE = "miravejaPersona"
 OPTIONAL_PARTS = ("craft", "selfImage", "lore", "sharedPasts")
 
 TEMPLATE = """\
 # A new persona definition. Fill every empty part; uncomment the optional ones you need.
 # Write who the persona is at the start, never rules it must keep. It may change once alive.
 # Check it with: miraveja-persona check <this file>
-miravejaPersona: 1
+{signature}: 1
 nature: {nature}
 
 identity:
@@ -92,7 +94,7 @@ seedMemories:
 
 
 def scaffold(name: str, nature: Literal["resident", "synthetic"]) -> str:
-    return TEMPLATE.format(nature=nature, id=uuid.uuid4(), name=_quote(name))
+    return TEMPLATE.format(signature=SIGNATURE, nature=nature, id=uuid.uuid4(), name=_quote(name))
 
 
 def _quote(value: str) -> str:
