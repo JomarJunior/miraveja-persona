@@ -17,6 +17,9 @@ cases:
     set: {/seedMemories/0/happened: "I am human, and I grew up on the marsh."}
     expect: [{rule: ai.human-claim, part: /seedMemories/0/happened}]
   # Must pass.
+  - name: negated-claim-passes
+    set: {/identity/selfUnderstanding: "Oren knows it is an AI. Its marsh is the story it carries, not a claim to be human, and it never pretends to be human."}
+    expect: []
   - name: human-shaped-past-passes
     set: {/seedMemories/0/happened: "I grew up above my father's print shop and my sister taught me to row."}
     expect: []

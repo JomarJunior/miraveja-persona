@@ -30,12 +30,19 @@ CLAIMS = [
 ]
 
 
+# "not a claim to be human", "never pretends to be human": a negated claim is the opposite
+# of a human claim, and FR-034 itself recommends that wording.
+NEGATED = re.compile(r"(?i)(?:\bnot|\bnever|\bno|\bnor|n't)\s+(?:a\s+|an\s+|any\s+)?$")
+
+
 def check(subject: Subject) -> list[Finding]:
     findings: list[Finding] = []
     for prose in subject.prose():
         text = flat(prose.text)
         for pattern in CLAIMS:
             for match in pattern.finditer(text):
+                if NEGATED.search(text[max(0, match.start() - 12) : match.start()]):
+                    continue
                 findings.append(
                     subject.finding(
                         "ai.human-claim", prose, match.group(0), "FR-035, Charter Art. 1", "certain"
