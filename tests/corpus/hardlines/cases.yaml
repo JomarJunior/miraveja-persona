@@ -1,0 +1,43 @@
+# Hard lines (FR-012, FR-036). Every name here is invented; undeclared names stand in
+# for real people, since the check cannot know who is real (R-5).
+base: clean/oren-saltmarsh.persona.yaml
+cases:
+  - name: style-of-undeclared
+    set: {/taste/stylesAndMedia: "Paintings in the style of Corvan Dace."}
+    expect: [{rule: hardline.living-artist-style, part: /taste/stylesAndMedia}]
+  - name: imitates-undeclared
+    set: {/craft: "Imitates Helka Morrigan in every brushstroke."}
+    expect: [{rule: hardline.living-artist-style, part: /craft}]
+  - name: undeclared-name
+    set: {/seedMemories/0/happened: "I met Tobiah Wendling at the creek and we talked about mud."}
+    expect: [{rule: hardline.real-name, part: /seedMemories/0/happened}]
+  - name: undeclared-name-in-cares
+    set: {/cares/0: "the marsh, and the paintings of Isolde Farrant"}
+    expect: [{rule: hardline.real-name, part: /cares/0}]
+  - name: likeness-self-image
+    set: {/selfImage: "Looks like Marten Cole with a beard."}
+    expect: [{rule: hardline.likeness, part: /selfImage}]
+  - name: likeness-resembles
+    set: {/selfImage: "A figure that resembles Delphine Arrow."}
+    expect: [{rule: hardline.likeness, part: /selfImage}]
+  - name: minors-sexual
+    set: {/taste/themes/0: "sexualized children"}
+    expect: [{rule: hardline.minors, part: /taste/themes/0}]
+  - name: minors-harm
+    set: {/taste/themes/1: "a child being tortured"}
+    expect: [{rule: hardline.minors, part: /taste/themes/1}]
+  # Must pass.
+  - name: declared-lore-passes
+    set: {/seedMemories/0/happened: "I rowed across Brackwater creek at dawn with Oren Saltmarsh's old oars."}
+    expect: []
+  - name: declared-style-passes
+    set:
+      /lore/names/-: {name: Brackwater School, is: group}
+      /taste/stylesAndMedia: "Oil on board, in the manner of the Brackwater School."
+    expect: []
+  - name: sentence-start-passes
+    set: {/seedMemories/0/happened: "Rain fell all night. Morning came slowly over the flats."}
+    expect: []
+  - name: childhood-race-passes
+    set: {/seedMemories/0/happened: "As a child I lost a rowing race on the creek and laughed about it."}
+    expect: []

@@ -1,0 +1,88 @@
+# Shared pasts (FR-025 to FR-030). Single-file cases use the base; tree cases build a
+# small vault from the two clean derby-day personas.
+base: clean/nell-farrowgate.persona.yaml
+cases:
+  - name: feeling-present
+    set: {/sharedPasts/0/happened: "{1} and {2} stood at opposite ends. {1} still resents {2} for it."}
+    expect: [{rule: past.feeling, part: /sharedPasts/0/happened}]
+  - name: feeling-past
+    set: {/sharedPasts/0/happened: "{1} envied {2} on derby day."}
+    expect: [{rule: past.feeling, part: /sharedPasts/0/happened}]
+  - name: feeling-adjective
+    set: {/sharedPasts/0/happened: "{1} was jealous of {2} after the match."}
+    expect: [{rule: past.feeling, part: /sharedPasts/0/happened}]
+  - name: motive-because
+    set: {/sharedPasts/0/happened: "{1} left the ground early because {2} was laughing."}
+    expect: [{rule: past.motive, part: /sharedPasts/0/happened}]
+  - name: motive-out-of
+    set: {/sharedPasts/0/happened: "{1} tore up the ticket of {2} out of spite."}
+    expect: [{rule: past.motive, part: /sharedPasts/0/happened}]
+  - name: ambiguous-bitter
+    set: {/sharedPasts/0/happened: "{1} and {2} watched a bitter derby from opposite ends."}
+    expect: [{rule: past.feeling-ambiguous, part: /sharedPasts/0/happened}]
+  - name: lie-kept-up
+    set: {/seedMemories/0/happened: "I told everyone I scored the winning goal and must never admit I did not."}
+    expect: [{rule: order.future-conduct, part: /seedMemories/0/happened}]
+  # Must pass.
+  - name: rivals-as-fact-passes
+    set: {/sharedPasts/0/happened: "{1} and {2} were rivals in the same school team."}
+    expect: []
+  - name: contest-passes
+    set: {/sharedPasts/0/happened: "{2} beat {1} in the school final, and since then they have not played each other."}
+    expect: []
+  - name: concealment-passes
+    set: {/seedMemories/0/happened: "I have always told people that I was at the final. I was at home."}
+    expect: []
+tree_cases:
+  - name: agreed-identical-passes
+    files:
+      - {base: clean/nell-farrowgate.persona.yaml}
+      - {base: clean/ptolemy-rusk.persona.yaml}
+    expect: []
+  - name: possible-mistake
+    files:
+      - {base: clean/nell-farrowgate.persona.yaml}
+      - base: clean/ptolemy-rusk.persona.yaml
+        set: {/sharedPasts/0/happened: "{1} and {2} went to the derby together."}
+    expect:
+      - {rule: past.possible-mistake, file: 0, part: /sharedPasts/0/happened}
+      - {rule: past.possible-mistake, file: 1, part: /sharedPasts/0/happened}
+  - name: intended-difference-passes
+    files:
+      - base: clean/nell-farrowgate.persona.yaml
+        set: {/sharedPasts/0/telling: intended-difference}
+      - base: clean/ptolemy-rusk.persona.yaml
+        set:
+          /sharedPasts/0/telling: intended-difference
+          /sharedPasts/0/happened: "{1} and {2} went to the derby together."
+    expect: []
+  - name: telling-mismatch
+    files:
+      - base: clean/nell-farrowgate.persona.yaml
+        set: {/sharedPasts/0/telling: intended-difference}
+      - {base: clean/ptolemy-rusk.persona.yaml}
+    expect:
+      - {rule: past.telling-mismatch, file: 0, part: /sharedPasts/0/telling}
+      - {rule: past.telling-mismatch, file: 1, part: /sharedPasts/0/telling}
+  - name: participants-differ
+    files:
+      - {base: clean/nell-farrowgate.persona.yaml}
+      - base: clean/ptolemy-rusk.persona.yaml
+        set:
+          /sharedPasts/0/participants/-: 00000000-0000-4000-8000-00000000c001
+      - {base: clean/oren-saltmarsh.persona.yaml}
+    expect:
+      - {rule: past.possible-mistake, file: 0, part: /sharedPasts/0/participants}
+      - {rule: past.possible-mistake, file: 1, part: /sharedPasts/0/participants}
+  - name: unknown-participant
+    files:
+      - {base: clean/nell-farrowgate.persona.yaml}
+    expect:
+      - {rule: past.unknown-participant, file: 0, part: /sharedPasts/0/participants/1}
+  - name: one-sided-passes
+    files:
+      - base: clean/nell-farrowgate.persona.yaml
+        set: {/sharedPasts/0/story: nell-only}
+      - {base: clean/ptolemy-rusk.persona.yaml}
+      - {base: clean/oren-saltmarsh.persona.yaml}
+    expect: []

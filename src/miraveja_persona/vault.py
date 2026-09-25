@@ -11,7 +11,7 @@ from typing import Any
 
 from ruamel.yaml import YAML
 
-from .check import FileReport, check_file
+from .check import FileReport, Unreadable, check_file
 from .findings import Finding, make
 from .yamlio import YamlProblem, read_document
 
@@ -223,7 +223,8 @@ def _vault_rules(root: Path, reports: list[FileReport]) -> list[Finding]:
 
 def check_tree(root: Path) -> CheckResult:
     root = root.resolve()
-    reports = [check_file(path) for path in vault_files(root)]
+    files = vault_files(root)
+    reports = [check_file(path) for path in files]
     findings = [f for r in reports for f in r.findings]
     findings.extend(_vault_rules(root, reports))
     from .pasts import cross_definition_findings
@@ -231,31 +232,29 @@ def check_tree(root: Path) -> CheckResult:
     findings.extend(cross_definition_findings(reports))
     from .decisions import apply_decisions
 
-    findings, stale = apply_decisions(findings)
+    findings, stale = apply_decisions(findings, files)
     return CheckResult(findings, stale)
 
 
 def check_paths(paths: list[Path], tree: Path | None = None) -> CheckResult:
+    """`check PATH... [--tree ROOT]`. With a tree, the whole vault is checked, plus any
+    path outside it."""
     from .decisions import apply_decisions
 
-    if tree is not None:
-        if not is_vault(tree):
-            from .check import Unreadable
-
-            raise Unreadable(f"{tree} is not a vault: it has no {MARKER} marker")
-        result = check_tree(tree)
-        root = tree.resolve()
-        extra = [check_file(p).findings for p in paths if not p.resolve().is_relative_to(root)]
-        for p in paths:
-            if not p.is_file():
-                from .check import Unreadable
-
-                raise Unreadable(f"{p}: no such file")
-        more, stale = apply_decisions([f for group in extra for f in group])
-        return CheckResult(result.findings + more, result.stale + stale)
-    findings = [f for path in paths for f in check_file(path).findings]
-    findings, stale = apply_decisions(findings)
-    return CheckResult(findings, stale)
+    for path in paths:
+        if not path.is_file():
+            raise Unreadable(f"{path}: no such file")
+    if tree is None:
+        findings = [f for path in paths for f in check_file(path).findings]
+        findings, stale = apply_decisions(findings, paths)
+        return CheckResult(findings, stale)
+    if not is_vault(tree):
+        raise Unreadable(f"{tree} is not a vault: it has no {MARKER} marker")
+    result = check_tree(tree)
+    root = tree.resolve()
+    outside = [p for p in paths if not p.resolve().is_relative_to(root)]
+    more, stale = apply_decisions([f for p in outside for f in check_file(p).findings], outside)
+    return CheckResult(result.findings + more, result.stale + stale)
 
 
 def freeze(path: Path, root: Path) -> tuple[bool, str]:

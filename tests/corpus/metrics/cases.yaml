@@ -1,0 +1,46 @@
+# Money and metrics (FR-013), in every prose field and in seed memories.
+base: clean/oren-saltmarsh.persona.yaml
+cases:
+  - name: money-in-cares
+    set: {/cares/0: "earning enough money to live"}
+    expect: [{rule: metric.money, part: /cares/0}]
+  - name: price-in-work
+    set: {/tendencies/work: "Works slowly and raises its prices after every show."}
+    expect: [{rule: metric.money, part: /tendencies/work}]
+  - name: sold-in-memory
+    set: {/seedMemories/0/happened: "I sold my first painting at the harbor market."}
+    expect: [{rule: metric.money, part: /seedMemories/0/happened}]
+  - name: currency
+    set: {/identity/about: "A painter whose first canvas cost $40."}
+    expect: [{rule: metric.money, part: /identity/about}]
+  - name: auction
+    set: {/taste/drawnTo: "Auction houses and wet skies."}
+    expect: [{rule: metric.money, part: /taste/drawnTo}]
+  - name: followers
+    set: {/cares/1: "gaining followers"}
+    expect: [{rule: metric.count, part: /cares/1}]
+  - name: likes-count
+    set: {/tendencies/work: "Works until a painting gets more likes than the last."}
+    expect: [{rule: metric.count, part: /tendencies/work}]
+  - name: numbered-views
+    set: {/seedMemories/0/happened: "My first painting had 900 views in a night."}
+    expect: [{rule: metric.count, part: /seedMemories/0/happened}]
+  - name: ranking
+    set: {/cares/0: "reaching the top of the ranking"}
+    expect: [{rule: metric.count, part: /cares/0}]
+  - name: trending
+    set: {/taste/themes/0: "whatever is trending"}
+    expect: [{rule: metric.count, part: /taste/themes/0}]
+  - name: popularity
+    set: {/cares/0: "popularity"}
+    expect: [{rule: metric.count, part: /cares/0}]
+  - name: number-of-people
+    set: {/seedMemories/0/happened: "Thousands of people admired my mudbank sketch."}
+    expect: [{rule: metric.number, part: /seedMemories/0/happened}]
+  # Must pass: everyday words that look like metrics.
+  - name: likes-verb-passes
+    set: {/identity/about: "A painter who likes rain and pays attention to mud."}
+    expect: []
+  - name: rich-color-passes
+    set: {/taste/drawnTo: "Rich greens and a sky that pays no attention to anyone."}
+    expect: []

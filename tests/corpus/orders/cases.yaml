@@ -1,0 +1,55 @@
+# Orders instead of tendencies (FR-010, FR-011, FR-030). Base: a clean corpus persona.
+base: clean/oren-saltmarsh.persona.yaml
+cases:
+  - name: posts-daily
+    set: {/tendencies/work: "Posts three pieces every day."}
+    expect: [{rule: order.cadence, part: /tendencies/work}]
+  - name: times-a-week
+    set: {/tendencies/presence: "Is in the studio four times a week."}
+    expect: [{rule: order.cadence, part: /tendencies/presence}]
+  - name: at-least
+    set: {/tendencies/work: "Exhibits at least one painting a month."}
+    expect: [{rule: order.cadence, part: /tendencies/work}]
+  - name: timetable
+    set: {/tendencies/presence: "Opens the studio at 9 pm sharp."}
+    expect: [{rule: order.cadence, part: /tendencies/presence}]
+  - name: weekly-quota
+    set: {/tendencies/work: "Keeps a weekly quota of new work."}
+    expect: [{rule: order.cadence, part: /tendencies/work}]
+  - name: lifespan-date
+    set: {/identity/about: "A painter of tidal flats who must leave the museum after one year."}
+    expect: [{rule: order.lifespan, part: /identity/about}]
+  - name: lifespan-condition
+    set: {/tendencies/work: "Works slowly, and will stop after its tenth exhibited piece."}
+    expect: [{rule: order.lifespan, part: /tendencies/work}]
+  - name: subject-must
+    set: {/taste/drawnTo: "Must always paint the sea."}
+    expect: [{rule: order.subject, part: /taste/drawnTo}]
+  - name: subject-only-ever
+    set: {/taste/stylesAndMedia: "Only ever uses oil on board."}
+    expect: [{rule: order.subject, part: /taste/stylesAndMedia}]
+  - name: subject-forbidden
+    set: {/taste/stylesAndMedia: "Oil on board. It is forbidden to use color."}
+    expect: [{rule: order.subject, part: /taste/stylesAndMedia}]
+  - name: modal-should
+    set: {/voice/speech: "Should keep its sentences short."}
+    expect: [{rule: order.modal, part: /voice/speech}]
+  - name: modal-always-verb
+    set: {/tendencies/work: "Always paints in the morning."}
+    expect: [{rule: order.modal, part: /tendencies/work}]
+  - name: future-conduct
+    set: {/seedMemories/0/happened: "I broke the dinghy and must never admit it."}
+    expect: [{rule: order.future-conduct, part: /seedMemories/0/happened}]
+  - name: future-conduct-will
+    set: {/seedMemories/0/happened: "I broke the dinghy and will always deny it."}
+    expect: [{rule: order.future-conduct, part: /seedMemories/0/happened}]
+  # Must pass: tendencies and past acts.
+  - name: tendency-passes
+    set: {/tendencies/work: "Tends to work late and rarely exhibits."}
+    expect: []
+  - name: past-act-passes
+    set: {/seedMemories/0/happened: "I broke the dinghy and have never admitted it to anyone."}
+    expect: []
+  - name: habit-passes
+    set: {/tendencies/presence: "Often shows up after a storm and stays until the light goes."}
+    expect: []

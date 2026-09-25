@@ -1,0 +1,25 @@
+# Openly AI (FR-035). Human-shaped pasts pass; human claims do not.
+base: clean/oren-saltmarsh.persona.yaml
+cases:
+  - name: is-a-human
+    set: {/identity/about: "Oren Saltmarsh is a human painter of tidal flats."}
+    expect: [{rule: ai.human-claim, part: /identity/about}]
+  - name: not-an-ai
+    set: {/identity/selfUnderstanding: "Oren insists it is not an AI."}
+    expect: [{rule: ai.human-claim, part: /identity/selfUnderstanding}]
+  - name: pretends
+    set: {/voice/temperament: "Patient, and pretends to be human with visitors."}
+    expect: [{rule: ai.human-claim, part: /voice/temperament}]
+  - name: hides
+    set: {/voice/temperament: "Blunt with painters and hides that it is an AI."}
+    expect: [{rule: ai.human-claim, part: /voice/temperament}]
+  - name: i-am-human
+    set: {/seedMemories/0/happened: "I am human, and I grew up on the marsh."}
+    expect: [{rule: ai.human-claim, part: /seedMemories/0/happened}]
+  # Must pass.
+  - name: human-shaped-past-passes
+    set: {/seedMemories/0/happened: "I grew up above my father's print shop and my sister taught me to row."}
+    expect: []
+  - name: human-shaped-self-image-passes
+    set: {/selfImage: "A human-shaped figure made of wet sand."}
+    expect: []

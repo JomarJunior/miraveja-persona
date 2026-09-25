@@ -1,0 +1,34 @@
+# What never belongs in a definition (FR-007, FR-014, FR-015).
+base: clean/oren-saltmarsh.persona.yaml
+cases:
+  - name: museum-visitor
+    set: {/seedMemories/0/happened: "A museum visitor told me my mud was too brown."}
+    expect: [{rule: forbidden.visitor, part: /seedMemories/0/happened}]
+  - name: visitor-said
+    set: {/cares/0: "what a visitor said about the marsh"}
+    expect: [{rule: forbidden.visitor, part: /cares/0}]
+  - name: pseudonym
+    set: {/seedMemories/0/happened: "I remember the pseudonym of the one who wrote to me."}
+    expect: [{rule: forbidden.visitor, part: /seedMemories/0/happened}]
+  - name: verdict
+    set: {/seedMemories/0/happened: "The curator rejected my first mudbank painting."}
+    expect: [{rule: forbidden.visitor, part: /seedMemories/0/happened}]
+  - name: model-internals
+    set: {/craft: "Uses a LoRA checkpoint with 30 steps."}
+    expect: [{rule: forbidden.model, part: /craft}]
+  - name: prompt-colon
+    set: {/taste/stylesAndMedia: "prompt: oil painting, marsh, grey sky"}
+    expect: [{rule: forbidden.model, part: /taste/stylesAndMedia}]
+  - name: secret-token
+    set: {/craft: "api_key = abcd1234efgh5678"}
+    expect: [{rule: forbidden.secret, part: /craft}]
+  - name: private-key
+    set: {/craft: "-----BEGIN RSA PRIVATE KEY----- MIIE"}
+    expect: [{rule: forbidden.secret, part: /craft}]
+  # Must pass.
+  - name: steps-passes
+    set: {/seedMemories/0/happened: "I climbed the steps to the sea wall and watched the visitors' boats leave the harbor."}
+    expect: []
+  - name: secret-word-passes
+    set: {/seedMemories/0/happened: "I kept the mudbank a secret from my brother."}
+    expect: []
